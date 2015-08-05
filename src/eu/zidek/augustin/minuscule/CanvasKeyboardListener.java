@@ -39,7 +39,7 @@ class CanvasKeyboardListener implements KeyListener {
 		}
 		// Reset the translation, zoom and set the zoom slider
 		else if (keyCode == KeyEvent.VK_HOME) {
-			this.canvas.resetView();
+			this.canvas.resetTranslationAndZoom();
 			this.zoomSlider.setValue(Constants.ZOOM_1_VALUE);
 		}
 	}

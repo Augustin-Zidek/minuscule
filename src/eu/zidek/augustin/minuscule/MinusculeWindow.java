@@ -4,21 +4,30 @@ import java.awt.BorderLayout;
 import java.awt.Color;
 import java.awt.Dimension;
 import java.awt.FlowLayout;
-import java.awt.GridLayout;
+import java.awt.Frame;
+import java.awt.Insets;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.KeyListener;
 import java.awt.event.MouseAdapter;
+import java.awt.event.MouseEvent;
 import java.awt.event.MouseWheelListener;
-import java.util.Hashtable;
+import java.awt.image.BufferedImage;
+import java.io.IOException;
 
+import javax.imageio.ImageIO;
 import javax.swing.JButton;
+import javax.swing.JFileChooser;
 import javax.swing.JFrame;
 import javax.swing.JLabel;
+import javax.swing.JOptionPane;
 import javax.swing.JPanel;
 import javax.swing.JSlider;
+import javax.swing.border.EmptyBorder;
 import javax.swing.event.ChangeEvent;
 import javax.swing.event.ChangeListener;
+import javax.swing.filechooser.FileFilter;
+import javax.swing.filechooser.FileNameExtensionFilter;
 
 /**
  * A Minuscule window that holds a canvas in it.
@@ -34,6 +43,26 @@ public class MinusculeWindow {
 	private final JPanel contentPane;
 	private final Canvas canvas;
 	private final Color bg;
+	private final JSlider slider = new JSlider(1, 100, 25);
+	private final JLabel lblZoomValue = new JLabel("100%");
+
+	/**
+	 * Creates a default canvas window with a canvas on which basic geometric
+	 * shapes can be drawn using the methods provided in the {@link Canvas}.
+	 * 
+	 * The background color of the default canvas is set to white, the window
+	 * title is set to "Minuscule Canvas".
+	 * 
+	 * The window od the default canvas is maximized.
+	 */
+	public MinusculeWindow() {
+		this(0, 0, Constants.DEFAULT_WINDOW_TITLE, Color.WHITE);
+		// Set size to 800x600 so that when un-maximized, this size is used
+		this.frame.setSize(800, 600);
+		// Maximize the frame
+		this.frame.setExtendedState(this.frame.getExtendedState()
+				| Frame.MAXIMIZED_BOTH);
+	}
 
 	/**
 	 * Creates a default canvas window with a canvas on which basic geometric
@@ -48,15 +77,7 @@ public class MinusculeWindow {
 	 *            bigger by the control panel on the bottom).
 	 */
 	public MinusculeWindow(final int width, final int height) {
-		this.width = width;
-		this.height = height;
-		this.title = Constants.DEFAULT_WINDOW_TITLE;
-		this.bg = Color.WHITE;
-		// Initialize the frame and the canvas itself
-		this.frame = new JFrame();
-		this.contentPane = new JPanel();
-		this.canvas = new Canvas(width, height);
-		this.initUI();
+		this(width, height, Constants.DEFAULT_WINDOW_TITLE, Color.WHITE);
 	}
 
 	/**
@@ -98,64 +119,128 @@ public class MinusculeWindow {
 		this.contentPane.add(this.canvas, BorderLayout.CENTER);
 		this.canvas.setPreferredSize(new Dimension(this.width, this.height));
 
-		// The panel with controls
+		// Makes resizing of the window nicer - the canvas doesn't flicker
+		this.canvas.setDoubleBuffered(true);
+
+		// The lower panel with controls
 		final JPanel controlPanel = new JPanel();
 		this.contentPane.add(controlPanel, BorderLayout.SOUTH);
-		controlPanel.setLayout(new GridLayout(1, 3));
+		controlPanel.setLayout(new BorderLayout());
 
-		// The panel with information
+		controlPanel.setDoubleBuffered(true);
+
+		// The left lower panel with information
 		final JPanel infoPanel = new JPanel();
-		infoPanel.setLayout(new BorderLayout());
-		controlPanel.add(infoPanel, BorderLayout.NORTH);
+		infoPanel.setLayout(new BorderLayout(5, 0));
+		// Add it some borders
+		infoPanel.setBorder(new EmptyBorder(4, 2, 2, 0));
+		controlPanel.add(infoPanel, BorderLayout.WEST);
 
 		// Author and copyright info (please, don't remove)
 		final JLabel lblInfo = new JLabel(Constants.AUTHOR);
-		infoPanel.add(lblInfo, BorderLayout.SOUTH);
+		lblInfo.setFont(lblInfo.getFont().deriveFont(0, 9F));
+		infoPanel.add(lblInfo, BorderLayout.EAST);
 
 		// Info button, display information panel when clicked
 		final JButton btnInfo = new JButton("Info");
+		btnInfo.setMargin(new Insets(0, 2, 0, 2));
 		infoPanel.add(btnInfo, BorderLayout.WEST);
 		btnInfo.addActionListener(new ActionListener() {
-
 			@Override
 			public void actionPerformed(ActionEvent e) {
 				new InfoDialog(MinusculeWindow.this.frame, "Information");
 			}
 		});
 
-		// Ugly, but works, adds space above help button
-		final JLabel lblBlank = new JLabel(" ");
-		infoPanel.add(lblBlank, BorderLayout.NORTH);
+		final JButton btnSaveImage = new JButton("Save as PNG");
+		btnSaveImage.setMargin(new Insets(0, 2, 0, 2));
+		infoPanel.add(btnSaveImage, BorderLayout.CENTER);
+
+		btnSaveImage.addActionListener(new ActionListener() {
+			@Override
+			public void actionPerformed(ActionEvent e) {
+				// Get the image from the canvas
+				final BufferedImage img = MinusculeWindow.this.canvas
+						.getImage();
+
+				final JFileChooser fc = new JFileChooser();
+				// Set up the filter for .png files
+				final FileFilter filter = new FileNameExtensionFilter(
+						"PNG File", "png");
+				fc.setFileFilter(filter);
+
+				// Get the return value from the save dialog
+				int returnVal = fc.showSaveDialog(MinusculeWindow.this.frame);
+
+				// If file selected, save the canvas image into the given path
+				if (returnVal == JFileChooser.APPROVE_OPTION) {
+					try {
+						// Write the image to the given file
+						ImageIO.write(img, "png", fc.getSelectedFile());
+						// Show a message confirming success
+						JOptionPane.showMessageDialog(
+								MinusculeWindow.this.frame, "Image "
+										+ fc.getSelectedFile().toString()
+										+ " saved successfully.");
+					}
+					catch (final IOException e1) {
+						// On error, show error message
+						JOptionPane
+								.showMessageDialog(MinusculeWindow.this.frame,
+										Constants.ERROR_MESSAGE_SAVE_IMAGE,
+										"Error saving image",
+										JOptionPane.ERROR_MESSAGE);
+					}
+
+				}
+			}
+		});
 
 		// The zoom panel
 		final JPanel zoomPanel = new JPanel();
-		zoomPanel.setLayout(new FlowLayout(FlowLayout.RIGHT));
-		controlPanel.add(zoomPanel);
+		zoomPanel.setLayout(new FlowLayout(FlowLayout.LEADING));
+		zoomPanel.setBorder(new EmptyBorder(2, 0, 2, 0));
+		controlPanel.add(zoomPanel, BorderLayout.EAST);
 
+		// The "Zoom" label
 		final JLabel lblZoom = new JLabel("Zoom:");
+		lblZoom.setFont(lblZoom.getFont().deriveFont(0));
 		zoomPanel.add(lblZoom);
 
 		// The zoom slider
-		final JSlider slider = new JSlider(1, 100, 25);
-		zoomPanel.add(slider);
-		final Hashtable<Integer, JLabel> labelTable = new Hashtable<>();
-		labelTable.put(new Integer(2), new JLabel("0.04"));
-		labelTable.put(new Integer(Constants.ZOOM_1_VALUE), new JLabel("1"));
-		labelTable.put(new Integer(35), new JLabel("2"));
-		labelTable.put(new Integer(50), new JLabel("4"));
-		labelTable.put(new Integer(75), new JLabel("9"));
-		labelTable.put(new Integer(100), new JLabel("16"));
-		slider.setLabelTable(labelTable);
-		slider.setPaintLabels(true);
-		slider.setMajorTickSpacing(25);
-		slider.setPaintTicks(true);
+		final Dimension sliderDim = this.slider.getPreferredSize();
+		this.slider.setPreferredSize(new Dimension(100, sliderDim.height));
+		zoomPanel.add(this.slider);
+
+		// The zoom value label
+		this.lblZoomValue.setToolTipText("Click to reset to 100%.");
+		this.lblZoomValue.setFont(this.lblZoomValue.getFont().deriveFont(0));
+		// Fix the size of this label, so it doesn't move the slider
+		final Dimension d = this.lblZoomValue.getPreferredSize();
+		this.lblZoomValue
+				.setPreferredSize(new Dimension(d.width + 12, d.height));
+		zoomPanel.add(this.lblZoomValue);
+
+		// Listener for clicks on the zoom value label
+		this.lblZoomValue.addMouseListener(new MouseAdapter() {
+			@Override
+			public void mouseClicked(MouseEvent e) {
+				// Reset zoom to 100%
+				MinusculeWindow.this.canvas.setZoom(1);
+				// Set the zoom value label to default
+				MinusculeWindow.this.lblZoomValue.setText("100%");
+				// Set the slider to the position of 100%
+				MinusculeWindow.this.slider.setValue(25);
+			}
+		});
 
 		// The listener for the slider, that zooms the canvas
-		slider.addChangeListener(new ChangeListener() {
+		this.slider.addChangeListener(new ChangeListener() {
 			@Override
 			public void stateChanged(ChangeEvent e) {
 				// Get the raw value from the slider
-				final double sliderValue = slider.getValue();
+				final double sliderValue = MinusculeWindow.this.slider
+						.getValue();
 				final double zoomFactor;
 				// For values 0--25 use v/25, for higher values use (v/25)^2.
 				if (sliderValue < Constants.ZOOM_1_VALUE) {
@@ -166,6 +251,9 @@ public class MinusculeWindow {
 							* (sliderValue / Constants.ZOOM_1_VALUE);
 				}
 				MinusculeWindow.this.canvas.setZoom(zoomFactor);
+				final String zoomValue = String.format("%.0f%%",
+						zoomFactor * 100);
+				MinusculeWindow.this.lblZoomValue.setText(zoomValue);
 			}
 		});
 
@@ -177,17 +265,19 @@ public class MinusculeWindow {
 		this.canvas.setBackground(this.bg);
 
 		// The mouse drag listener responsible for mouse translation
-		final MouseAdapter mouseDragL = new CanvasMouseMoveListener(this.canvas);
+		final MouseAdapter mouseDragL = new CanvasMouseListener(this.canvas,
+				this);
 		this.canvas.addMouseListener(mouseDragL);
 		this.canvas.addMouseMotionListener(mouseDragL);
 
 		// The mouse wheel listener responsible for zooming
-		final MouseWheelListener mouseWhL = new CanvasMouseWheelListener(slider);
+		final MouseWheelListener mouseWhL = new CanvasMouseWheelListener(
+				this.canvas, this.slider);
 		this.canvas.addMouseWheelListener(mouseWhL);
 
 		// The keyboard listener responsible for translation
 		final KeyListener keyListener = new CanvasKeyboardListener(this.canvas,
-				slider);
+				this.slider);
 		// Set focusable, so that keyboard events are captured
 		this.canvas.setFocusable(true);
 		this.canvas.requestFocus();
@@ -201,5 +291,14 @@ public class MinusculeWindow {
 	 */
 	public Canvas getCanvas() {
 		return this.canvas;
+	}
+
+	/**
+	 * Resets the zoom slider to the position of 100% and resets the zoom value
+	 * label to 100%.
+	 */
+	void resetZoomFactor() {
+		this.slider.setValue(25);
+		this.lblZoomValue.setText("100%");
 	}
 }
