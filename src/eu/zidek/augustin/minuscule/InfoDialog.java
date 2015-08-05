@@ -27,6 +27,7 @@ class InfoDialog extends JDialog {
 		super(parent, title, true);
 		this.setModalExclusionType(Dialog.ModalExclusionType.APPLICATION_EXCLUDE);
 
+		// Try to get contents from the web
 		try {
 			final JEditorPane ep = new JEditorPane(Constants.INFO_PATH);
 			ep.putClientProperty(JEditorPane.HONOR_DISPLAY_PROPERTIES,
@@ -35,11 +36,13 @@ class InfoDialog extends JDialog {
 			ep.setEditable(false);
 			this.getContentPane().add(ep);
 		}
+		// No Internet connection - use built-in information dialog
 		catch (IOException ioe) {
 			JOptionPane.showMessageDialog(parent, Constants.INFO_NO_WEB);
 			return;
 		}
 
+		// Close button
 		final JPanel buttonPane = new JPanel();
 		buttonPane.setBackground(Color.WHITE);
 		final JButton button = new JButton("OK");
