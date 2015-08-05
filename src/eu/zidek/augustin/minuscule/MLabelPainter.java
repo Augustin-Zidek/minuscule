@@ -49,7 +49,6 @@ public class MLabelPainter implements MGeometricObjectPainter {
 		}
 
 		g2d.setColor(label.getColor());
-		g2d.setFont(label.getFont());
 		g2d.setStroke(label.getStroke());
 
 		// Handle cases when the label is positioned relative to the parent
@@ -65,10 +64,18 @@ public class MLabelPainter implements MGeometricObjectPainter {
 
 		// If Euclidean, turn off y-scaling and do the transform manually
 		if (this.canvas != null && this.canvas.isEuclidean()) {
-			// Scale the label's font by (1, -1) as the Euclidean scale on the
-			// whole canvas scales the labels as well
-			final AffineTransform euclideanScale = AffineTransform
-					.getScaleInstance(1, -1);
+			// Scale label's font by c*(1, -1) as the Euclidean scale scales the
+			// labels as well. c depends on scaling indifference
+			final AffineTransform euclideanScale;
+			// If zoom indifferent, divide scale-factor by the current zoom
+			if (label.isZoomIndifferent()) {
+				euclideanScale = AffineTransform.getScaleInstance(1 / g2d
+						.getTransform().getScaleX(), 1 / g2d.getTransform()
+						.getScaleY());
+			}
+			else {
+				euclideanScale = AffineTransform.getScaleInstance(1, -1);
+			}
 			g2d.setFont(label.getFont().deriveFont(euclideanScale));
 
 			// If label has no parent use its x, y coordinates instead of offset

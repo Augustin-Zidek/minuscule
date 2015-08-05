@@ -4,6 +4,7 @@ import java.awt.BasicStroke;
 import java.awt.Color;
 
 import eu.zidek.augustin.minuscule.Canvas;
+import eu.zidek.augustin.minuscule.MBasicStroke;
 import eu.zidek.augustin.minuscule.MLine;
 import eu.zidek.augustin.minuscule.MinusculeWindow;
 
@@ -45,7 +46,7 @@ class MinusculeLineTest {
 				.color(Color.BLUE)
 				.label("Hi", 0)
 				.thickness(15F)
-				.stroke(new BasicStroke(12F, BasicStroke.CAP_ROUND,
+				.stroke(new MBasicStroke(12F, BasicStroke.CAP_ROUND,
 						BasicStroke.JOIN_BEVEL)).draw(c);
 		Thread.sleep(750);
 

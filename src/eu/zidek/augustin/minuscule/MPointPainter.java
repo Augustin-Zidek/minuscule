@@ -14,9 +14,16 @@ public class MPointPainter implements MGeometricObjectPainter {
 	@Override
 	public void paint(final MGeometricObject pointObject, final Graphics2D g2d) {
 		final MPoint object = (MPoint) pointObject;
-		
+
 		// Construct a circle with given properties
-		final double radius = object.getRadius();
+		final double radius;
+		// If zoom indifferent, divide the radius by the zoom
+		if (object.isZoomIndifferent()) {
+			radius = object.getRadius() / g2d.getTransform().getScaleX();
+		}
+		else {
+			radius = object.getRadius();
+		}
 		final double diameter = radius * 2;
 		// Recalculate coordinates so the center is in the middle, not in
 		// upper-left corner of the bounding rectangle
@@ -33,5 +40,4 @@ public class MPointPainter implements MGeometricObjectPainter {
 			g2d.draw(point);
 		}
 	}
-
 }

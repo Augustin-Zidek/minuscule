@@ -74,16 +74,29 @@ public class MPolygonPainter implements MGeometricObjectPainter {
 			this.drawFilling(polygon.getFillColor(), g2d, vertices);
 		}
 
+		// Check if the polygon is zoom indifferent
+		final boolean zoomIndifferent = polygon.isZoomIndifferent();
+
 		for (int i = 0; i < vertices.size(); i++) {
 			// Get two consecutive vertices
-			final MPoint vertex1 = vertices.get(i);
+			final MPoint vertex1 = vertices.get(i).zoomIndifferent(
+					zoomIndifferent);
 			final MPoint vertex2 = vertices.get((i + 1) % vertices.size());
 
-			// Draw the edge first, so it is under the points
-			g2d.setStroke(polygon.getStroke());
+			// If zoom indifferent change the stroke's thickness
+			if (zoomIndifferent) {
+				final double oldThickness = polygon.getStroke().getThickness();
+				final double dx = g2d.getTransform().getScaleX();
+				final MStroke newStroke = polygon.getStroke().setThickness(
+						(float) (oldThickness / dx));
+				g2d.setStroke(newStroke);
+			}
+			else {
+				g2d.setStroke(polygon.getStroke());
+			}
 			g2d.setColor(polygon.getColor());
 
-			// Draw the line between the two consecutive vertices
+			// Draw the edge first, so it is under the points
 			final Line2D line = new Line2D.Double(vertex1.getX(),
 					vertex1.getY(), vertex2.getX(), vertex2.getY());
 			g2d.draw(line);
@@ -92,7 +105,9 @@ public class MPolygonPainter implements MGeometricObjectPainter {
 			this.pointPainter.paint(vertex1, g2d);
 			// If vertex has a label, paint it as well
 			if (vertex1.getLabel() != null) {
-				this.labelPainter.paint(vertex1.getLabel(), g2d);
+				this.labelPainter.paint(
+						vertex1.getLabel().zoomIndifferent(zoomIndifferent),
+						g2d);
 			}
 		}
 	}

@@ -1,7 +1,6 @@
 package eu.zidek.augustin.minuscule;
 
 import java.awt.Color;
-import java.awt.Stroke;
 
 /**
  * The most general interface for all geometric objects the canvas supports.
@@ -19,8 +18,9 @@ public abstract class MGeometricObject implements Comparable<MGeometricObject> {
 	private Color color;
 	private boolean fill;
 	private MLabel label;
-	private Stroke stroke;
+	private MStroke stroke;
 	private int layer;
+	private boolean zoomIndifferent;
 
 	// Determines if the object should be added to canvas, or just repainted
 	private boolean shouldBeAddedToCanvas = true;
@@ -37,14 +37,18 @@ public abstract class MGeometricObject implements Comparable<MGeometricObject> {
 	 * @param label The label of the object
 	 * @param stroke The stroke used to draw the object
 	 * @param layer The layer at which the object is located
+	 * @param zoomIndifferent <code>true</code> if the object should be zoom
+	 *            indifferent, <code>false</code> otherwise
 	 */
 	protected MGeometricObject(final Color color, final boolean fill,
-			final MLabel label, final Stroke stroke, final int layer) {
+			final MLabel label, final MStroke stroke, final int layer,
+			final boolean zoomIndifferent) {
 		this.color = color;
 		this.fill = fill;
 		this.label = label;
 		this.stroke = stroke;
 		this.layer = layer;
+		this.zoomIndifferent = zoomIndifferent;
 	}
 
 	// PUBLIC GETTERS: To be used mostly by Canvas
@@ -77,7 +81,7 @@ public abstract class MGeometricObject implements Comparable<MGeometricObject> {
 	 * @return The stroke used by this object. If none set returns the concrete
 	 *         object's default stroke.
 	 */
-	public Stroke getStroke() {
+	public MStroke getStroke() {
 		return this.stroke;
 	}
 
@@ -91,6 +95,14 @@ public abstract class MGeometricObject implements Comparable<MGeometricObject> {
 	 */
 	public int getLayer() {
 		return this.layer;
+	}
+
+	/**
+	 * @return The zoom indifference, i.e. <code>true</code> if the object is
+	 *         zoom indifferent, <code>false</code> otherwise
+	 */
+	public boolean isZoomIndifferent() {
+		return this.zoomIndifferent;
 	}
 
 	// PROTECTED SETTERS AND OTHER METHODS: To be used only by extending classes
@@ -114,7 +126,7 @@ public abstract class MGeometricObject implements Comparable<MGeometricObject> {
 		}
 	}
 
-	protected void setStroke(final Stroke stroke) {
+	protected void setStroke(final MStroke stroke) {
 		this.stroke = stroke;
 	}
 
@@ -122,6 +134,10 @@ public abstract class MGeometricObject implements Comparable<MGeometricObject> {
 		this.layer = layer;
 		// Force the canvas to resort the objects upon drawing
 		this.shouldBeLayerUpdated = true;
+	}
+
+	protected void setZoomIndifference(final boolean value) {
+		this.zoomIndifferent = value;
 	}
 
 	protected void doDraw(final Canvas c) {
@@ -217,9 +233,9 @@ public abstract class MGeometricObject implements Comparable<MGeometricObject> {
 	 * @param stroke The stroke to be used when drawing this object. If not
 	 *            called, default Minuscule Stroke will be used.
 	 * @return The object which has the given stroke applied
-	 * @see java.awt.Stroke
+	 * @see MStroke
 	 */
-	public abstract MGeometricObject stroke(final Stroke stroke);
+	public abstract MGeometricObject stroke(final MStroke stroke);
 
 	/**
 	 * Sets the object's layer to the given value. The layer determines when the
@@ -277,6 +293,17 @@ public abstract class MGeometricObject implements Comparable<MGeometricObject> {
 	 * @return The translated object
 	 */
 	public abstract MGeometricObject translate(final double dx, final double dy);
+
+	/**
+	 * Sets zoom indifference - i.e. if an object is zoom indifferent, then
+	 * zooming the canvas in and out doesn't change its dimensions. By default
+	 * objects are <b>not</b> zoom indifferent.
+	 * 
+	 * @param value <code>true</code> if object should be zoom indifferent,
+	 *            <code>false</code> otherwise
+	 * @return The object with modified zoom indifference
+	 */
+	public abstract MGeometricObject zoomIndifferent(final boolean value);
 
 	/**
 	 * If a label is on its own (i.e. it doesn't have a parent), its position is

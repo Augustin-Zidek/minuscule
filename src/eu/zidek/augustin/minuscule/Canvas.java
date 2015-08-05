@@ -11,7 +11,10 @@ import java.awt.Graphics2D;
 import java.awt.RenderingHints;
 import java.awt.geom.Line2D;
 import java.awt.image.BufferedImage;
+import java.io.File;
+import java.io.IOException;
 
+import javax.imageio.ImageIO;
 import javax.swing.JOptionPane;
 import javax.swing.JPanel;
 
@@ -146,6 +149,7 @@ public class Canvas extends JPanel {
 						JOptionPane.ERROR_MESSAGE);
 				continue;
 			}
+
 			// Paint the object using the painter
 			painter.paint(object, g2d);
 		}
@@ -292,10 +296,35 @@ public class Canvas extends JPanel {
 	 *            first.
 	 */
 	public void setZoom(final double zoomFactor) {
+
+		// FIXME: Notify zoom listeners
+
 		this.zoom = zoomFactor;
 		this.repaint();
 	}
 
+	/**
+	 * Zooms in/out the canvas. The point at the given canvas coordinates stays
+	 * at the same canvas coordinates after the zoom. Hence if you want to zoom
+	 * in so that the canvas stays always centered, call:
+	 * <code>zoomToPoint(zoomFactor, new MCoordinate(width/2, height/2))</code>.
+	 * 
+	 * @param zoomFactor The new zoom factor of the canvas.
+	 * @param point Canvas coordinates of the point that has to be on the same
+	 *            canvas coordinates after the zoom.
+	 */
+	public void setZoomToPoint(final double zoomFactor, final MCoordinate point) {
+		// Translate by vector p.newZoom - p.oldZoom
+		final double zoomRatio = zoomFactor / this.zoom;
+
+		// Translate so the given point stays on the same place at the canvas.
+		this.translate((this.translateX - point.x) * (zoomRatio - 1),
+				(this.translateY - point.y) * (zoomRatio - 1));
+
+		// Set the new zoom. Repaint call there.
+		this.setZoom(zoomFactor);
+	}
+	
 	/**
 	 * @return Returns the current zoom factor of the canvas.
 	 */
@@ -344,8 +373,8 @@ public class Canvas extends JPanel {
 	public void resetTranslationAndZoom() {
 		this.translateX = 0;
 		this.translateY = 0;
-		this.zoom = 1;
-		this.repaint();
+		// Repaint will be called at setZoom()
+		this.setZoom(1);
 	}
 
 	/**
@@ -361,12 +390,11 @@ public class Canvas extends JPanel {
 	 * Resets the zoom factor to 1 and repaints.
 	 */
 	public void resetZoom() {
-		this.zoom = 1;
-		this.repaint();
+		this.setZoom(1);
 	}
 
 	/**
-	 * @return The screenshot of the current canvas
+	 * @return The screenshot of the current canvas screen
 	 */
 	public BufferedImage getImage() {
 		// Create buffered image from the canvas
@@ -380,6 +408,21 @@ public class Canvas extends JPanel {
 		this.paintComponent(g2dimg);
 
 		return image;
+	}
+
+	/**
+	 * Saves a screenshot in the given format of the current canvas screen into
+	 * the given file.
+	 * 
+	 * @param file The file into which the image should be saved.
+	 * @throws IOException If an error occurs during writing.
+	 */
+	public void saveScreenShot(final File file) throws IOException {
+		// Get the image from the canvas
+		final BufferedImage img = this.getImage();
+
+		// Write the image to the given file
+		ImageIO.write(img, Constants.DEFAULT_SCREENSHOT_FILE_FORMAT, file);
 	}
 
 }

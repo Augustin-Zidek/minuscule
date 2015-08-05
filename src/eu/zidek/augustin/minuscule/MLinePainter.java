@@ -1,5 +1,6 @@
 package eu.zidek.augustin.minuscule;
 
+import java.awt.BasicStroke;
 import java.awt.Graphics2D;
 import java.awt.geom.Line2D;
 
@@ -17,7 +18,14 @@ public class MLinePainter implements MGeometricObjectPainter {
 
 		final Line2D line = new Line2D.Double(object.getStartX(),
 				object.getStartY(), object.getEndX(), object.getEndY());
-		g2d.setStroke(object.getStroke());
+		// If zoom indifferent, divide thickness by the zoom
+		if (object.isZoomIndifferent()) {
+			g2d.setStroke(new BasicStroke((float) (object.getThickness() / g2d
+					.getTransform().getScaleX())));
+		}
+		else {
+			g2d.setStroke(object.getStroke());
+		}
 		g2d.setColor(object.getColor());
 
 		// Line can't be filled, filling modified using Stroke

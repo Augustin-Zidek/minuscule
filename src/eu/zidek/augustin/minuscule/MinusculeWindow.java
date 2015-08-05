@@ -24,8 +24,6 @@ import javax.swing.JOptionPane;
 import javax.swing.JPanel;
 import javax.swing.JSlider;
 import javax.swing.border.EmptyBorder;
-import javax.swing.event.ChangeEvent;
-import javax.swing.event.ChangeListener;
 import javax.swing.filechooser.FileFilter;
 import javax.swing.filechooser.FileNameExtensionFilter;
 
@@ -191,7 +189,6 @@ public class MinusculeWindow {
 										"Error saving image",
 										JOptionPane.ERROR_MESSAGE);
 					}
-
 				}
 			}
 		});
@@ -199,26 +196,37 @@ public class MinusculeWindow {
 		// The zoom panel
 		final JPanel zoomPanel = new JPanel();
 		zoomPanel.setLayout(new FlowLayout(FlowLayout.LEADING));
-		zoomPanel.setBorder(new EmptyBorder(2, 0, 2, 0));
+		zoomPanel.setBorder(new EmptyBorder(0, 0, 0, 0));
 		controlPanel.add(zoomPanel, BorderLayout.EAST);
 
 		// The "Zoom" label
 		final JLabel lblZoom = new JLabel("Zoom:");
 		lblZoom.setFont(lblZoom.getFont().deriveFont(0));
+		lblZoom.setToolTipText(Constants.TLT_ZOOM_LABEL);
 		zoomPanel.add(lblZoom);
 
-		// The zoom slider
-		final Dimension sliderDim = this.slider.getPreferredSize();
-		this.slider.setPreferredSize(new Dimension(100, sliderDim.height));
-		zoomPanel.add(this.slider);
+		// The zoom OUT button
+		final JButton btnZoomOut = new JButton(Constants.BTN_ZOOM_IN);
+		btnZoomOut.setMargin(new Insets(-2, 1, -2, 1));
+		zoomPanel.add(btnZoomOut);
+
+		btnZoomOut.addActionListener(new ActionListener() {
+			@Override
+			public void actionPerformed(ActionEvent e) {
+				final double newZoom = MinusculeWindow.this.canvas.getZoom()
+						* Constants.DEFAULT_ZOOM_OUT_FACTOR;
+				MinusculeWindow.this.canvas.setZoomToPoint(newZoom,
+						new MCoordinate(
+								MinusculeWindow.this.canvas.getWidth() / 2,
+								MinusculeWindow.this.canvas.getHeight() / 2));
+				final String zoomValue = String.format("%.0f%%", newZoom * 100);
+				MinusculeWindow.this.lblZoomValue.setText(zoomValue);
+			}
+		});
 
 		// The zoom value label
-		this.lblZoomValue.setToolTipText("Click to reset to 100%.");
+		this.lblZoomValue.setToolTipText(Constants.TLT_ZOOM_VALUE);
 		this.lblZoomValue.setFont(this.lblZoomValue.getFont().deriveFont(0));
-		// Fix the size of this label, so it doesn't move the slider
-		final Dimension d = this.lblZoomValue.getPreferredSize();
-		this.lblZoomValue
-				.setPreferredSize(new Dimension(d.width + 12, d.height));
 		zoomPanel.add(this.lblZoomValue);
 
 		// Listener for clicks on the zoom value label
@@ -234,25 +242,21 @@ public class MinusculeWindow {
 			}
 		});
 
-		// The listener for the slider, that zooms the canvas
-		this.slider.addChangeListener(new ChangeListener() {
+		// The zoom IN button
+		final JButton btnZoomIn = new JButton(Constants.BTN_ZOOM_OUT);
+		btnZoomIn.setMargin(new Insets(-2, 1, -2, 1));
+		zoomPanel.add(btnZoomIn);
+
+		btnZoomIn.addActionListener(new ActionListener() {
 			@Override
-			public void stateChanged(ChangeEvent e) {
-				// Get the raw value from the slider
-				final double sliderValue = MinusculeWindow.this.slider
-						.getValue();
-				final double zoomFactor;
-				// For values 0--25 use v/25, for higher values use (v/25)^2.
-				if (sliderValue < Constants.ZOOM_1_VALUE) {
-					zoomFactor = sliderValue / Constants.ZOOM_1_VALUE;
-				}
-				else {
-					zoomFactor = (sliderValue / Constants.ZOOM_1_VALUE)
-							* (sliderValue / Constants.ZOOM_1_VALUE);
-				}
-				MinusculeWindow.this.canvas.setZoom(zoomFactor);
-				final String zoomValue = String.format("%.0f%%",
-						zoomFactor * 100);
+			public void actionPerformed(ActionEvent e) {
+				final double newZoom = MinusculeWindow.this.canvas.getZoom()
+						* Constants.DEFAULT_ZOOM_IN_FACTOR;
+				MinusculeWindow.this.canvas.setZoomToPoint(newZoom,
+						new MCoordinate(
+								MinusculeWindow.this.canvas.getWidth() / 2,
+								MinusculeWindow.this.canvas.getHeight() / 2));
+				final String zoomValue = String.format("%.0f%%", newZoom * 100);
 				MinusculeWindow.this.lblZoomValue.setText(zoomValue);
 			}
 		});
@@ -272,7 +276,7 @@ public class MinusculeWindow {
 
 		// The mouse wheel listener responsible for zooming
 		final MouseWheelListener mouseWhL = new CanvasMouseWheelListener(
-				this.canvas, this.slider);
+				this.canvas);
 		this.canvas.addMouseWheelListener(mouseWhL);
 
 		// The keyboard listener responsible for translation

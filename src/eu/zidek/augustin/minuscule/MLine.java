@@ -3,9 +3,7 @@
  */
 package eu.zidek.augustin.minuscule;
 
-import java.awt.BasicStroke;
 import java.awt.Color;
-import java.awt.Stroke;
 
 /**
  * 
@@ -34,7 +32,8 @@ public class MLine extends MGeometricObject {
 	 */
 	public MLine() {
 		super(Constants.DEFAULT_LINE_COLOR, Constants.DEFAULT_LINE_FILL, null,
-				Constants.DEFAULT_LINE_STROKE, Constants.DEFAULT_LINE_LAYER);
+				Constants.DEFAULT_LINE_STROKE, Constants.DEFAULT_LINE_LAYER,
+				Constants.DEFAULT_LINE_ZOOM_INDIFFERENCE);
 	}
 
 	/**
@@ -151,7 +150,7 @@ public class MLine extends MGeometricObject {
 	 * @return The line with a new thickness set
 	 */
 	public MLine thickness(final float thickness) {
-		super.setStroke(new BasicStroke(thickness));
+		super.setStroke(new MBasicStroke(thickness));
 		this.thickness = thickness;
 		return this;
 	}
@@ -175,7 +174,7 @@ public class MLine extends MGeometricObject {
 	}
 
 	@Override
-	public MLine stroke(final Stroke stroke) {
+	public MLine stroke(final MStroke stroke) {
 		super.setStroke(stroke);
 		return this;
 	}
@@ -208,6 +207,12 @@ public class MLine extends MGeometricObject {
 		// Set the label's parent
 		label.parent(this);
 		super.setLabel(label);
+		return this;
+	}
+
+	@Override
+	public MLine zoomIndifferent(final boolean value) {
+		super.setZoomIndifference(value);
 		return this;
 	}
 

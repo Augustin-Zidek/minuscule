@@ -6,11 +6,11 @@ import static eu.zidek.augustin.minuscule.Constants.DEFAULT_LABEL_FILL;
 import static eu.zidek.augustin.minuscule.Constants.DEFAULT_LABEL_IS_UNMOVABLE;
 import static eu.zidek.augustin.minuscule.Constants.DEFAULT_LABEL_LAYER;
 import static eu.zidek.augustin.minuscule.Constants.DEFAULT_LABEL_STROKE;
+import static eu.zidek.augustin.minuscule.Constants.DEFAULT_LABEL_ZOOM_INDIFFERENCE;
 import static eu.zidek.augustin.minuscule.Constants.DEFAULT_POINT_LABEL_POSITION;
 
 import java.awt.Color;
 import java.awt.Font;
-import java.awt.Stroke;
 
 /**
  * Minuscule label with various attributes, such as position, text, color,
@@ -37,7 +37,8 @@ public class MLabel extends MGeometricObject {
 	 */
 	public MLabel(final String text) {
 		super(DEFAULT_LABEL_COLOR, DEFAULT_LABEL_FILL, null,
-				DEFAULT_LABEL_STROKE, DEFAULT_LABEL_LAYER);
+				DEFAULT_LABEL_STROKE, DEFAULT_LABEL_LAYER,
+				DEFAULT_LABEL_ZOOM_INDIFFERENCE);
 		this.labelText = text;
 	}
 
@@ -237,7 +238,7 @@ public class MLabel extends MGeometricObject {
 	}
 
 	@Override
-	public MLabel stroke(final Stroke stroke) {
+	public MLabel stroke(final MStroke stroke) {
 		super.setStroke(stroke);
 		return this;
 	}
@@ -245,6 +246,12 @@ public class MLabel extends MGeometricObject {
 	@Override
 	public MLabel layer(final int layer) {
 		super.setLayer(layer);
+		return this;
+	}
+
+	@Override
+	public MLabel zoomIndifferent(final boolean value) {
+		super.setZoomIndifference(value);
 		return this;
 	}
 

@@ -3,6 +3,7 @@ package eu.zidek.augustin.minuscule.test;
 import java.awt.BasicStroke;
 
 import eu.zidek.augustin.minuscule.Canvas;
+import eu.zidek.augustin.minuscule.MBasicStroke;
 import eu.zidek.augustin.minuscule.MLine;
 import eu.zidek.augustin.minuscule.MPoint;
 import eu.zidek.augustin.minuscule.MinusculeWindow;
@@ -38,7 +39,7 @@ class MinusculeFunctionTest {
 			new MLine()
 					.start(x, y1)
 					.end(x2, y2)
-					.stroke(new BasicStroke(1, BasicStroke.CAP_ROUND,
+					.stroke(new MBasicStroke(1, BasicStroke.CAP_ROUND,
 							BasicStroke.JOIN_ROUND)).draw(c);
 		}
 

@@ -2,7 +2,6 @@ package eu.zidek.augustin.minuscule;
 
 import java.awt.Color;
 import java.awt.Shape;
-import java.awt.Stroke;
 import java.awt.geom.AffineTransform;
 import java.awt.geom.Rectangle2D;
 
@@ -23,8 +22,10 @@ public class MShape extends MGeometricObject {
 	 * @param shape The shape that should be held and drawn.
 	 */
 	public MShape(final Shape shape) {
-		super(Constants.DEFAULT_SHAPE_COLOR, Constants.DEFAULT_SHAPE_FILL, null,
-				Constants.DEFAULT_SHAPE_STROKE, Constants.DEFAULT_SHAPE_LAYER);
+		super(Constants.DEFAULT_SHAPE_COLOR, Constants.DEFAULT_SHAPE_FILL,
+				null, Constants.DEFAULT_SHAPE_STROKE,
+				Constants.DEFAULT_SHAPE_LAYER,
+				Constants.DEFAULT_SHAPE_ZOOM_INDIFFERENCE);
 		this.shape = shape;
 	}
 
@@ -52,7 +53,7 @@ public class MShape extends MGeometricObject {
 	}
 
 	@Override
-	public MShape stroke(final Stroke stroke) {
+	public MShape stroke(final MStroke stroke) {
 		super.setStroke(stroke);
 		return this;
 	}
@@ -103,6 +104,12 @@ public class MShape extends MGeometricObject {
 		// Set the label's parent
 		label.parent(this);
 		super.setLabel(label);
+		return this;
+	}
+
+	@Override
+	public MShape zoomIndifferent(final boolean value) {
+		super.setZoomIndifference(value);
 		return this;
 	}
 

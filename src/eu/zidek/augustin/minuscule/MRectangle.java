@@ -1,7 +1,6 @@
 package eu.zidek.augustin.minuscule;
 
 import java.awt.Color;
-import java.awt.Stroke;
 
 /**
  * Minuscule Rectangle with various attributes such as position, size, label,
@@ -24,7 +23,8 @@ public class MRectangle extends MGeometricObject {
 		super(Constants.DEFAULT_RECTANGLE_COLOR,
 				Constants.DEFAULT_RECTANGLE_FILL, null,
 				Constants.DEFAULT_RECTANGLE_STROKE,
-				Constants.DEFAULT_RECTANGLE_LAYER);
+				Constants.DEFAULT_RECTANGLE_LAYER,
+				Constants.DEFAULT_RECTANGLE_ZOOM_INDIFFERENCE);
 	}
 
 	/**
@@ -149,7 +149,7 @@ public class MRectangle extends MGeometricObject {
 	}
 
 	@Override
-	public MRectangle stroke(final Stroke stroke) {
+	public MRectangle stroke(final MStroke stroke) {
 		super.setStroke(stroke);
 		return this;
 	}
@@ -162,7 +162,8 @@ public class MRectangle extends MGeometricObject {
 
 	@Override
 	public MRectangle label(final String labelText) {
-		return this.label(labelText, Constants.DEFAULT_RECTANGLE_LABEL_POSITION);
+		return this
+				.label(labelText, Constants.DEFAULT_RECTANGLE_LABEL_POSITION);
 	}
 
 	@Override
@@ -182,6 +183,12 @@ public class MRectangle extends MGeometricObject {
 		// Set the label's parent
 		label.parent(this);
 		super.setLabel(label);
+		return this;
+	}
+
+	@Override
+	public MRectangle zoomIndifferent(final boolean value) {
+		super.setZoomIndifference(value);
 		return this;
 	}
 

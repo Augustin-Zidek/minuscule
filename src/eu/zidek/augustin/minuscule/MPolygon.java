@@ -1,7 +1,6 @@
 package eu.zidek.augustin.minuscule;
 
 import java.awt.Color;
-import java.awt.Stroke;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -24,7 +23,8 @@ public class MPolygon extends MGeometricObject {
 	public MPolygon() {
 		super(Constants.DEFAULT_POLYGON_COLOR, Constants.DEFAULT_POLYGON_FILL,
 				null, Constants.DEFAULT_POLYGON_STROKE,
-				Constants.DEFAULT_POLYGON_LAYER);
+				Constants.DEFAULT_POLYGON_LAYER,
+				Constants.DEFAULT_POLYGON_ZOOM_INDIFFERENCE);
 	}
 
 	/**
@@ -160,7 +160,7 @@ public class MPolygon extends MGeometricObject {
 	}
 
 	@Override
-	public MPolygon stroke(final Stroke stroke) {
+	public MPolygon stroke(final MStroke stroke) {
 		super.setStroke(stroke);
 		return this;
 	}
@@ -216,6 +216,12 @@ public class MPolygon extends MGeometricObject {
 	}
 
 	@Override
+	public MPolygon zoomIndifferent(final boolean value) {
+		super.setZoomIndifference(value);
+		return this;
+	}
+
+	@Override
 	public MPolygon translate(final double dx, final double dy) {
 		// Translate the polygon
 		for (final MPoint p : this.vertices) {
@@ -228,7 +234,6 @@ public class MPolygon extends MGeometricObject {
 
 	@Override
 	public MCoordinate getLabelCoordinates(final double angleDeg) {
-		// TODO: Something more sophisticated?
 		return new MCoordinate(0, 0);
 	}
 

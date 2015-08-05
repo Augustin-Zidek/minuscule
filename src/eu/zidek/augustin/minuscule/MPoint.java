@@ -1,7 +1,6 @@
 package eu.zidek.augustin.minuscule;
 
 import java.awt.Color;
-import java.awt.Stroke;
 
 /**
  * Minuscule point with various attributes such as position, radius, label,
@@ -22,7 +21,8 @@ public class MPoint extends MGeometricObject {
 	public MPoint() {
 		super(Constants.DEFAULT_POINT_COLOR, Constants.DEFAULT_POINT_FILL,
 				null, Constants.DEFAULT_POINT_STROKE,
-				Constants.DEFAULT_POINT_LAYER);
+				Constants.DEFAULT_POINT_LAYER,
+				Constants.DEFAULT_POINT_ZOOM_INDIFFERENCE);
 	}
 
 	/**
@@ -140,7 +140,7 @@ public class MPoint extends MGeometricObject {
 	}
 
 	@Override
-	public MPoint stroke(final Stroke stroke) {
+	public MPoint stroke(final MStroke stroke) {
 		super.setStroke(stroke);
 		return this;
 	}
@@ -148,6 +148,12 @@ public class MPoint extends MGeometricObject {
 	@Override
 	public MPoint layer(final int layer) {
 		super.setLayer(layer);
+		return this;
+	}
+
+	@Override
+	public MPoint zoomIndifferent(final boolean value) {
+		super.setZoomIndifference(value);
 		return this;
 	}
 
