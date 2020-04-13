@@ -21,7 +21,7 @@ class Minuscule2Test {
 		// Draw a grid
 		canvas.drawGrid(0.1F, 10, 10, Color.GRAY);
 
-		// Draw a B�zier curve
+		// Draw a Bézier curve
 		final Color greenTrp = new Color(0, 255, 100, 100);
 		new MShape(new CubicCurve2D.Double(10, 10, 2000, 500, 300, -500, 500,
 				500)).color(greenTrp).fill(true).draw(canvas);

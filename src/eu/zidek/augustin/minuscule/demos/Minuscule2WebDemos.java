@@ -56,7 +56,7 @@ public class Minuscule2WebDemos {
 		new MRectangle().pos(100, 100).dimensions(200, 150).color(Color.GREEN)
 				.fill(false).draw(canvas);
 
-		// Draw a custom shape - a Bézier curve
+		// Draw a custom shape - a BÃ©zier curve
 		Shape bezier = new CubicCurve2D.Double(150, 200, 400, -100, 300, 200,
 				400, 200);
 		new MShape(bezier).color(new Color(255, 0, 0, 100)).fill(true)
