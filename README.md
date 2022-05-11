@@ -22,6 +22,20 @@
 - It is not a replacement for OpenGL or any other proper big graphics library
 - It is not a 3D graphics library
 
+## Documentation
+
+For the complete documentation see
+[Javadoc](https://augustin.zidek.eu/minuscule/javadoc/index.html).
+
+After downloading, you must add the downloaded JAR file into your build path,
+see for instance this tutorial for Eclipse SDK. Or you can download the source
+code and use it directly by copying the contents of the archive into the folder
+where you other packages are stored.
+
+If you are interested in more advanced topics, such as the architecture of
+Minuscule or how to write your own Minuscule Geometric Objects, see the
+[manual](manual.md).
+
 ## Short tutorial with examples
 
 Using Minuscule is easy, it is in fact one of its main principles. To start, you
