@@ -25,7 +25,7 @@
 ## Documentation
 
 For the complete documentation see
-[Javadoc](https://augustin.zidek.eu/minuscule/javadoc/index.html).
+[Javadoc](https://augustin-zidek.github.io/minuscule/).
 
 After downloading, you must add the downloaded JAR file into your build path,
 see for instance this tutorial for Eclipse SDK. Or you can download the source
